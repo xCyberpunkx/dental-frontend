@@ -1,4 +1,5 @@
 "use client";
+import React, { Suspense } from "react";
 import { Card } from "@/components/ui/card";
 import { useCompleteProfile } from "@/hooks/pages/useCompleteProfile";
 import renderHeader from "@/components/sections/auth/completeProfile/renderHeader";
@@ -7,7 +8,7 @@ import renderPhoneField from "@/components/sections/auth/completeProfile/renderP
 import renderSexSelection from "@/components/sections/auth/completeProfile/renderSexSelection";
 import renderSubmitButton from "@/components/sections/auth/completeProfile/renderSubmitButton";
 
-export default function CompleteProfile() {
+function CompleteProfileInner() {
   const {
     tempToken,
     isLoading,
@@ -17,6 +18,7 @@ export default function CompleteProfile() {
     dateOfBirth,
     errors,
   } = useCompleteProfile();
+
   if (!tempToken) {
     return null;
   }
@@ -33,5 +35,13 @@ export default function CompleteProfile() {
         </form>
       </Card>
     </div>
+  );
+}
+
+export default function CompleteProfile() {
+  return (
+    <Suspense fallback={<div>Loading profile...</div>}>
+      <CompleteProfileInner />
+    </Suspense>
   );
 }

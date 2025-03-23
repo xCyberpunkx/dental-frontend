@@ -1,4 +1,5 @@
 "use client";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AlertCircle, LogIn } from "lucide-react";
@@ -9,9 +10,8 @@ import { useLogin } from "@/hooks/pages/useLogin";
 import EmailInput from "@/components/sections/auth/login/EmailInput";
 import PasswordInput from "@/components/sections/auth/login/PasswordInput";
 import GoogleSignInButton from "@/components/sections/auth/login/GoogleSignInButton";
-import { useEffect, useState } from "react";
 
-export default function Login() {
+function LoginInner() {
   const {
     email,
     password,
@@ -25,24 +25,26 @@ export default function Login() {
     handleGoogleSignIn,
   } = useLogin();
 
+  // Now use useSearchParams within the inner component
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();
 
   // 🔹 Start with 'false' if there are query params; otherwise 'true'
   const [showErrorPassword, setShowErrorPassword] = useState(false);
   const [showErrorEmail, setShowErrorEmail] = useState(false);
-  const [isSubmited, setisSubmited] = useState(true);
-  // 🔹 Update 'showError' based on 'errors.password' (fix dependency issue)
+  const [isSubmited, setIsSubmited] = useState(true);
+
   useEffect(() => {
     if (errors.password) {
       setShowErrorPassword(true);
     }
-  }, [password != "" && email != "", isSubmited]);
+  }, [password !== "" && email !== "", isSubmited]);
+
   useEffect(() => {
     if (errors.email) {
       setShowErrorEmail(true);
     }
-  }, [password != "" && email != "", isSubmited]);
+  }, [password !== "" && email !== "", isSubmited]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -84,7 +86,7 @@ export default function Login() {
             type="submit"
             className="w-full"
             disabled={isLoading}
-            onClick={() => setisSubmited(false)}
+            onClick={() => setIsSubmited(false)}
           >
             {isLoading ? "Logging in..." : "Log In"}{" "}
             <LogIn className="ml-2 h-4 w-4" />
@@ -126,5 +128,13 @@ export default function Login() {
         </div>
       </Card>
     </div>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<div>Loading login...</div>}>
+      <LoginInner />
+    </Suspense>
   );
 }
